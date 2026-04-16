@@ -19,3 +19,34 @@ th {
 	color: #ffffff;
 	background-color: #003366;
 }
+
+
+<head>
+    <title>Tag Practice</title>
+    <style>
+        
+         {
+            border: 2px blue;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <p>This is a paragraph inside the main container.</p>
+        
+        <p>This is <em>italic text</em> using the em tag.</p>
+
+        <ol>
+            <li>First list item</li>
+            <li>Second list item</li>
+        </ol>
+
+        <div>This is a generic div container.</div>
+
+    </main>
+
+</body>
+</html>
