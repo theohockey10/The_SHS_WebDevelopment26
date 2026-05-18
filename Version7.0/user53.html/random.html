@@ -1,29 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Random Guess Test</title>
-    <script>
-        const answer = Math.floor(Math.random() * 100) + 1;
-
-        function checkGuess() {
-            const guess = Number(document.getElementById('guess').value);
-            document.getElementById('guess').value = '';
-            if (guess < answer) {
-                alert('higher');
-            } else {
-                alert(answer);
-            }
-            return false;
-        }
-    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Word Classifier & Sentence Maker</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 1rem; }
+        ul { list-style: none; padding: 0; max-width: 720px; }
+        li { display: flex; gap: .5rem; align-items: center; padding: .25rem 0; }
+        .word { min-width: 120px; }
+        select, button, input { padding: .25rem .5rem; }
+        #controls { margin-top: 1rem; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+        #sentence { margin-top: 1rem; font-weight:600; color: blue; }
+        .removed { opacity:.4; text-decoration: line-through; }
+    </style>
 </head>
 <body>
-    <h1>Random Guess Test</h1>
-    <form onsubmit="return checkGuess();">
-        <input id="guess" type="number" />
-        <input type="submit" value="Submit" />
-    </form>
+    <h2>Remove & Classify Words (20+)</h2>
+    <p>Use the dropdown to classify each word and the Remove button to remove it from the list.</p>
+
+    <ul id="wordList"></ul>
+
+    <div id="controls">
+        <label>Noun: <input id="nounInput" placeholder="noun"></label>
+        <label>Adverb: <input id="adverbInput" placeholder="adverb"></label>
+        <label>Adjective: <input id="adjectiveInput" placeholder="adjective"></label>
+        <button id="makeBtn">Make Sentence</button>
+        <button id="showClasses">Show Classifications (console)</button>
+    </div>
+
+    <div id="sentence" aria-live="polite"></div>
+
+    <script>
+        // initial words (>=20)
+        const initialWords = [
+            'apple','run','beautiful','quickly','dog','happy','slowly','table','bright',
+            'sing','loudly','car','blue','jump','soft','river','green','think',
+            'softly','light','eat','angry','dance','beneath'
+        ];
+
+        const wordList = document.getElementById('wordList');
+        const classifications = {}; // word -> pos or "removed"
+
+        function makeRow(word) {
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.textContent = word;
+            span.className = 'word';
+            li.appendChild(span);
+
+            const select = document.createElement('select');
+            ['Unknown','Noun','Verb','Adjective','Adverb','Pronoun','Preposition','Conjunction','Interjection'].forEach(opt => {
+                const o = document.createElement('option'); o.value = opt.toLowerCase(); o.text = opt; select.appendChild(o);
+            });
+            select.value = 'unknown';
+            select.addEventListener('change', () => { classifications[word] = select.value; });
+            li.appendChild(select);
+
+            const rem = document.createElement('button');
+            rem.textContent = 'Remove';
+            rem.addEventListener('click', () => {
+                classifications[word] = 'removed';
+                span.classList.add('removed');
+                select.disabled = true;
+                rem.disabled = true;
+            });
+            li.appendChild(rem);
+
+            return li;
+        }
+
+        // populate
+        initialWords.forEach(w => {
+            classifications[w] = 'unknown';
+            wordList.appendChild(makeRow(w));
+        });
+
+        // sentence maker
+        document.getElementById('makeBtn').addEventListener('click', () => {
+            const noun = document.getElementById('nounInput').value.trim() || '[noun]';
+            const adv = document.getElementById('adverbInput').value.trim() || '[adverb]';
+            const adj = document.getElementById('adjectiveInput').value.trim() || '[adjective]';
+            const sentence = `The ${adj} ${noun} ${adv}.`;
+            document.getElementById('sentence').textContent = sentence[0].toUpperCase() + sentence.slice(1);
+        });
+
+        // utility: show current classifications in console
+        document.getElementById('showClasses').addEventListener('click', () => console.log(JSON.stringify(classifications, null, 2)));
+    </script>
 </body>
-</html>
 </html>
